@@ -22,7 +22,7 @@
 </div>
 
 
-<p align="center">📝<a href="">Technical Report</a> ｜🌐<a href="https://xqacmer.github.io/Ming-Flash-Omni-V2-TTS/">Project Page</a> ｜🤗 <a href="">Hugging Face</a>｜ 🤖 <a href="">ModelScope</a>
+<p align="center">🌐<a href="https://xqacmer.github.io/Ming-Flash-Omni-V2-TTS/">Project Page</a> ｜🤗 <a href="https://huggingface.co/inclusionAI/Ming-omni-tts-0.5B">Hugging Face</a>｜ 🤖 <a href="https://modelscope.cn/models/inclusionAI/Ming-omni-tts-0.5B">ModelScope</a>
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -1092,10 +1092,10 @@ You can download our latest model and Benchmark from both Huggingface and ModelS
 </div>
 
 
- If you're in mainland China, we strongly recommend you to download our model from 🤖 <a href="https://modelscope.cn/models/inclusionAI/Ming-omni-tts-16.8B-A3B">ModelScope</a>.
+ If you're in mainland China, we strongly recommend you to download our model from 🤖 <a href="https://modelscope.cn/models/inclusionAI/Ming-omni-tts-0.5B">ModelScope</a>.
 ```
 pip install modelscope
-modelscope download --model inclusionAI/Ming-omni-tts-16.8B-A3B --local_dir inclusionAI/Ming-omni-tts-16.8B-A3B  --revision master
+modelscope download --model inclusionAI/Ming-omni-tts-0.5B --local_dir inclusionAI/Ming-omni-tts-0.5B  --revision master
 ```
 
 Note: This download process will take several minutes to several hours, depending on your network conditions.
@@ -1164,4 +1164,4 @@ If you find our work helpful, feel free to give us a cite.
 ``` -->
 
 ## Join Us
-The Ant Group's Bailing (百灵) large language model team is seeking talented speech algorithm engineers for R&D in areas including **Speech Understanding, Generation, Dialogue, and Tokenizers**. If you're passionate about building state-of-the-art speech technology, send your resume to [lyuyongjie.lyj@Ant Group.com](mailto:lyuyongjie.lyj@Ant Group.com).
+The Ant Group's Bailing (百灵) large language model team is seeking talented speech algorithm engineers for R&D in areas including **Speech Understanding, Generation, Dialogue, and Tokenizers**. If you're passionate about building state-of-the-art speech technology, send your resume to [lyuyongjie.lyj@antgroup.com](mailto:lyuyongjie.lyj@antgroup.com).
