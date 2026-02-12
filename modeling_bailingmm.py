@@ -341,6 +341,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         text,
         max_decode_steps=200,
     ):
+        assert self.model_type == 'dense', "This functionality currently is not supported for MoE model"
         input_ids, inputs_embeds = self.prepare_input_embed(
             prompt=prompt,
             text=text,
@@ -348,68 +349,22 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         input_ids, inputs_embeds = input_ids[:,:-1], inputs_embeds[:,:-1,...]
         logger.info(self.tokenizer.decode(input_ids[0].cpu().numpy().tolist()).__repr__())
         attention_mask = torch.ones(input_ids.shape).to(input_ids.device)
-
-        if self.model_type == 'dense':
-            position_ids = (attention_mask.cumsum(-1) - 1).masked_fill_((attention_mask == 0), 1)
-            self.rope_deltas = None
-        else:
-            position_ids, rope_deltas = self.get_rope_index(
-                input_ids,
-                image_token_id=self.config.llm_config.image_patch_token,
-                video_token_id=self.config.llm_config.image_patch_token,
-                image_start_token_id=self.config.llm_config.image_start_token,
-                video_start_token_id=self.config.llm_config.video_start_token,
-                image_grid_thw=None,
-                video_grid_thw=None,
-                attention_mask=attention_mask,
-            )
-            self.rope_deltas = rope_deltas
-
+        position_ids = (attention_mask.cumsum(-1) - 1).masked_fill_((attention_mask == 0), 1)
+        self.rope_deltas = None
         past_key_values = None
-        for step in tqdm(range(max_decode_steps)):
-            with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
-                outputs = self.model(
-                    attention_mask=attention_mask,
-                    position_ids=position_ids,
-                    inputs_embeds=inputs_embeds,
-                    audio_mask=None,
-                    image_mask=None,
-                    output_hidden_states=True,
-                    return_dict=True,
-                    use_cache=True,
-                    past_key_values=past_key_values
-                )
-            logits = outputs.logits[:, -1, :]
-            next_token = torch.softmax(logits, dim=-1).argmax(dim=-1)
-            inputs_embeds = self.model.get_input_embeddings()(next_token).unsqueeze(0)
-            past_key_values = outputs.past_key_values
 
-            if self.model_type == 'dense':
-                position_ids = position_ids[:, -1:] + 1
-            else:
-                batch_size, seq_length, _ = inputs_embeds.shape
-                if past_key_values and self.rope_deltas:
-                    delta = past_key_values[0][1].shape[2] + self.rope_deltas
-                elif past_key_values:
-                    delta = torch.tensor(past_key_values[0][1].shape[2]).to(inputs_embeds.device)
-                else:
-                    delta = torch.tensor(0).to(inputs_embeds.device)
-                position_ids = torch.arange(seq_length, device=inputs_embeds.device)
-                position_ids = position_ids.view(1, -1).expand(batch_size, -1)
-                position_ids = position_ids.add(delta)
-                position_ids = position_ids.unsqueeze(0).expand(3, -1, -1)
+        generated_ids = self.model.generate(
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+            max_new_tokens=200,
+            eos_token_id=self.tokenizer.encode("<text_eos>")
+        )
 
-            attention_mask = torch.ones(inputs_embeds.shape[0], 1).to(inputs_embeds.device)
-            if self.model_type == 'dense':
-                bos, eos = "<text_bos>", "<text_eos>"
-            else:
-                bos, eos = "<|startoftext|>","<|endoftext|>"
-
-            if self.tokenizer.decode(next_token) not in [bos, eos]:
-                yield self.tokenizer.decode(next_token), False
-            if self.tokenizer.decode(next_token) in [eos]:
-                yield "", True
-                break
+        stop_id = self.tokenizer.encode("<text_eos>")
+        stop_index = [i for i, token in enumerate(generated_ids[0].tolist()) if token == stop_id[0]]
+        generated_ids = generated_ids[:, 1:stop_index[0]]
+        response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        yield response, True
 
     def sample(
         self,

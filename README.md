@@ -1026,14 +1026,14 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
     <tr>
       <td style="text-align: center; padding: 8px; border: none;">Gemini-2.5 Pro</td>
       <td style="text-align: center; padding: 8px; border: none;">Google</td>
-      <td style="text-align: center; padding: 8px; border: none;"><strong><u>2.00%</u></strong></td>
-      <td style="text-align: center; padding: 8px; border: none;"><strong><u>0.97%</u></strong></td>
+      <td style="text-align: center; padding: 8px; border: none;">2.00%</td>
+      <td style="text-align: center; padding: 8px; border: none;">0.97%</td>
     </tr>
     <tr>
       <td style="text-align: center; padding: 8px; border: none;"><strong><u>Ming-omni-tts-0.5B(ours)</u></strong></td>
       <td style="text-align: center; padding: 8px; border: none;">Ant Group</td>
-      <td style="text-align: center; padding: 8px; border: none;">4.43%</td>
-      <td style="text-align: center; padding: 8px; border: none;">2.10%</td>
+      <td style="text-align: center; padding: 8px; border: none;"><strong><u>1.97%</u></strong></td>
+      <td style="text-align: center; padding: 8px; border: none;"><strong><u>0.85%</u></strong></td>
     </tr>
   </tbody>
 </table>
