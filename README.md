@@ -31,7 +31,6 @@
   - [Audio Reconstruction](#audio-reconstruction)
   - [Audio Generation](#audio-generative)
 - [Citation](#citation)
-- [Join Us](#join-us)
 
 ## Introduction
 
