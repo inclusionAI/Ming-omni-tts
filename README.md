@@ -7,16 +7,7 @@
 ">
 <img src="./figures/ant-bailing.png" width="60" alt="Ming-omni-tts Logo" />
   <h1 style="margin: 0;">
-    <span style="
-      font-weight: bold;
-      background-color: #FFF3CD;
-      color: #856404;
-      padding: 6px 16px;
-      border-radius: 8px;
-      display: inline-block;
-    ">
-      Ming-omni-tts
-    </span>
+        Ming-omni-tts: A Simple and Efficient Unified Generation of Speech, Music, and Sound with Precise Control
   </h1>
   
 </div>
@@ -26,6 +17,7 @@
 
 ## Table of Contents
 - [Introduction](#introduction)
+- [Demo](#demo)
 - [Updates](#updates)
 - [Key Features](#key-features)
 - [Evaluation](#evaluation)
@@ -43,27 +35,30 @@
 
 ## Introduction
 
-<div style="text-align: center; margin: 20px 0;">
-  <span style="font-weight: bold; background-color: #FFF3CD; color: #856404; padding: 6px 12px; border-radius: 6px; display: inline-block;">
-    Ming-omni-tts: The Next Era of Instruction-to-Audio Synthesis
-  </span>
-</div>
-
-Developed by the Inclusion AI Team, Ming-omni-tts is a professional-grade, full-stack suite of intelligent audio generation models. Moving beyond conventional text-to-speech (TTS), it introduces a comprehensive Instruction-to-Audio framework that enables unprecedented control over timbre, emotion, and environmental context—ushering in a new era of expressive and context-aware synthetic audio.  
+Ming-omni-tts is a high-performance unified audio generation model that achieves precise control over speech attributes and enables single-channel synthesis of speech, environmental sounds, and music. Powered by a custom 12.5Hz continuous tokenizer and Patch-by-Patch compression, it delivers competitive inference efficiency (3.1Hz). Additionally, the model features robust text normalization capabilities for the accurate and natural narration of complex mathematical and chemical expressions.
 
 <strong>🚀 Core Capabilities</strong>
 
-The Ming-omni-tts suite is powered by four pillar technologies designed to provide a premium, flexible audio synthesis experience:  
-- 🔥 **Fine-grained Vocal Control**: Enables precise, instruction-based control over speech rate, intonation, volume, emotion, and dialects. It achieves **93%** accuracy for Cantonese generation, outperforming CosyVoice3, and supports podcast-style audio generation.  
-- 🔥 **Ultra-fast Inference**: Utilizes a continuous speech tokenizer at a low 12.5Hz frame rate, combined with a "patch-by-patch" 4-frame compression. This allows the LLM to perform inference at an ultra-low 3.1Hz, ensuring exceptionally high-speed generation.  
-- 🔥 **Advanced Voice Design**: Supports voice design via natural language descriptions, achieving performance on par with Qwen-TTS on the Instruct-TTS-Eval-zh benchmark. It also includes a built-in matrix of 50+ premium and classic character voices, accessible directly without prompt audio.  
-- 🔥 **Immersive Unified Generation**: An industry-first model that jointly generates speech, ambient audio, and music in a single channel. This is achieved via a continuous representation autoregressive model with a DiT head, delivering a truly immersive, "in-the-scene" experience.
+- 🔊 **Fine-grained Vocal Control:** Enables precise control over speech rate, pitch, volume, emotion, and dialects via simple instructions. It achieves **93%** accuracy for Cantonese (outperforming CosyVoice3) and **46.7%** for emotional control (surpassing Qwen3-TTS).
+- 🌌  **Intelligent Voice Design:** Features 100+ premium built-in voices and supports zero-shot voice design through natural language descriptions. Its performance on the Instruct-TTS-Eval-zh benchmark is on par with Qwen3-TTS.
+- 🎶  **Immersive Unified Generation:** The industry’s first autoregressive model to jointly generate speech, ambient sound, and music in a single channel. Built on a custom 12.5Hz continuous tokenizer and a DiT head architecture, it delivers a seamless, "in-the-scene" auditory experience.
+- ⚡ **High-efficiency Inference:** Introduces a "Patch-by-Patch" compression strategy that reduces the LLM inference frame rate to 3.1Hz. This significantly cuts latency and enables podcast-style audio generation while preserving naturalness and audio detail.
+- 🧪 **Professional Text Normalization:** The model accurately parses and narrates complex formats, including mathematical expressions and chemical equations, ensuring natural-sounding output for specialized applications.
 
 <!-- <p align="center">
     <img src="./figures/uniaudio.png" width="600"/>
 <p> -->
+## Demo
 
-## 📝 Updates
+<div align="center">
+  <video src="https://gw.alipayobjects.com/v/cto_asrtts/afts/video/A*l_uJTaeTrOYAAAAAiuAAAAgAelufAQ" width="500px" controls>
+  </video>
+  <p><i>Ming-omni-tts Demo</i></p>
+</div>
+
+
+
+## Updates
 
 - [ ] Support VLLM Inference
 - [ ] Technical Report
@@ -83,11 +78,15 @@ Ming-omni-tts features key optimizations as follows, compared to other audio-ass
 <p>
 
 ##  Evaluation
-In various benchmark tests, Ming-omni-tts demonstrates highly competitive results compared to the state-of-the-art (SOTA) models .
+- **Reconstruction:** The 12Hz tokenizer supports high-quality reconstruction across speech, music, and sound. Its performance is comparable to existing state-of-the-art methods across key fidelity metrics.
+- **Dialect Generation:** Achieves **96%** accuracy on WSYue-TTS-Eval and **86%** WSC-TTS-Eval, outperforming CosyVoice3.
+- **Emotional Expressiveness:** Delivers an average accuracy of **76.7%** on CV3-Eval emotional sets and **46.7%** on neutral emotion sets, significantly surpassing CosyVoice3-Base (40%) to reach SOTA levels.
+- **Instruction-based Voice Design:** Scores **76.20%** on InstructTTS-Eval-ZH. Its instruction-following capability is on par with Qwen3-TTS-VoiceDesign.
+- **Zero-shot Voice Clone:** Exhibits exceptional stability on Seed-tts-eval (Chinese) with a WER of **0.83%**, outperforming SeedTTS and GLM-TTS.
+- **Text Normalization (TN):** On internal technical testsets, the model achieves a CER of **1.97%** in normalized regions, delivering performance comparable to Gemini-2.5 Pro.
+
 
 ### Audio Tokenizer
-#### Reconstruction Performance
-Below is a comparison between Ming-omni-tts-tokenizer-12Hz and other state-of-the-art (SOTA) models on the audio reconstruction task.  
 Speech metrics are evaluated on AISHELL-3(44.1khz-Chinese) and VCTK(44.1khz-English).  
 Music metrics are evaluated on MUSDB18(44.1khz) and MUSDB18-HQ(44.1khz).   
 Audio metrics are evaluated on AudioCaps.  
@@ -99,7 +98,6 @@ Audio metrics are evaluated on AudioCaps.
 
 ### Speech Controllable Generative Tasks
 #### Zero-shot TTS
-Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) models on the Zero-shot TTS task.
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
   <caption><strong>Zero-shot speech generation performance comparison on the Seed-TTS testset.</strong></caption>
   <thead>
@@ -249,7 +247,7 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
 </table>
 
 #### Speech Attribute Control
-Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) models on the speech attribute control task.
+
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
   <thead>
     <tr>
@@ -482,7 +480,6 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
 
 
 #### Dialect Control
-Below is a comparison of state-of-the-art models for dialect control task.
 
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
   <caption><strong>Dialect performance comparison</strong></caption>
@@ -708,7 +705,7 @@ Below is a comparison of state-of-the-art models for dialect control task.
 
 
 #### Podcast TTS
-Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) models on the Podcast TTS task.
+
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
   <caption><strong>Podcast performance comparison on the ZipVoice-Dia-zh test set</strong></caption>
   <thead>
@@ -784,7 +781,7 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
 </table>
 
 #### Voice Design
-Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) models on the voice design task.
+
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
   <caption><strong>Voice Design performance comparison on the InstructTTSEval-ZH test set</strong></caption>
   <thead>
@@ -855,7 +852,7 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
 
 ### Audio & BGM Generation
 #### Text-To-BGM
-Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) models on the Text-To-BGM task.
+
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
   <caption><strong>Text-to-BGM performance comparison on the Ming-BGM-Eval test set</strong></caption>
   <thead>
@@ -936,7 +933,7 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
 </table>
 
 #### Text-To-Audio(TTA)
-Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) models on the Text-To-Audio task.
+
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
 <caption><strong> TTA performance comparison on the audiocaps test set </strong></caption>
   <thead>
@@ -1007,7 +1004,6 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
 
 ### Advanced Processing
 #### Text Normalization
-Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) models on the Text Normalization.
 
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
 <caption><strong> Text Normalization performance comparison on the internally constructed test set </strong></caption>
@@ -1138,8 +1134,8 @@ python3 test.py
 
 ### Audio Generation
 ```bash
-git clone https://github.com/inclusionAI/Ming-UniAudio.git
-cd Ming-UniAudio
+git clone https://github.com/inclusionAI/Ming-omni-tts.git
+cd Ming-omni-tts
 python3 cookbooks/test.py
 ```
 
@@ -1162,6 +1158,3 @@ If you find our work helpful, feel free to give us a cite.
       url={https://arxiv.org/abs/2511.05516}, 
 }
 ``` -->
-
-## Join Us
-The Ant Group's Bailing (百灵) large language model team is seeking talented speech algorithm engineers for R&D in areas including **Speech Understanding, Generation, Dialogue, and Tokenizers**. If you're passionate about building state-of-the-art speech technology, send your resume to [lyuyongjie.lyj@antgroup.com](mailto:lyuyongjie.lyj@antgroup.com).
