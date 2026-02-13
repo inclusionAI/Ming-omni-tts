@@ -51,7 +51,7 @@ Ming-omni-tts is a high-performance unified audio generation model that achieves
 ## Demo
 
 <div align="center">
-  <video src="https://gw.alipayobjects.com/v/cto_asrtts/afts/video/A*l_uJTaeTrOYAAAAAiuAAAAgAelufAQ" width="500px" controls>
+  <video src="https://gw.alipayobjects.com/v/uri/file/as/ming-omni-tts-demo.mp4" width="500px" controls>
   </video>
   <p><i>Ming-omni-tts Demo</i></p>
 </div>
