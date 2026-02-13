@@ -19,12 +19,12 @@
 - [Introduction](#introduction)
 - [Demo](#demo)
 - [Updates](#updates)
-- [Key Features](#key-features)
+- [Key Features](#-key-features)
 - [Evaluation](#evaluation)
   - [Audio Tokenizer](#audio-tokenizer)
   - [Speech Controllable Generative Tasks](#speech-controllable-generative-tasks)
   - [Audio & BGM Generation](#audio--bgm-generation)
-  - [Advanced Processing](#advanced-processing)
+  - [Text Normalization](#text-normalization)
 - [Model & Benchmark Downloads](#model--benchmark-downloads)
 - [Environment Preparation](#environment-preparation)
 - [Example Usage](#example-usage)
@@ -45,18 +45,10 @@ Ming-omni-tts is a high-performance unified audio generation model that achieves
 - ⚡ **High-efficiency Inference:** Introduces a "Patch-by-Patch" compression strategy that reduces the LLM inference frame rate to 3.1Hz. This significantly cuts latency and enables podcast-style audio generation while preserving naturalness and audio detail.
 - 🧪 **Professional Text Normalization:** The model accurately parses and narrates complex formats, including mathematical expressions and chemical equations, ensuring natural-sounding output for specialized applications.
 
-<!-- <p align="center">
-    <img src="./figures/uniaudio.png" width="600"/>
-<p> -->
 ## Demo
-
-<div align="center">
-  <video src="https://gw.alipayobjects.com/v/uri/file/as/ming-omni-tts-demo.mp4" width="500px" controls>
-  </video>
-  <p><i>Ming-omni-tts Demo</i></p>
-</div>
-
-
+<a href="https://www.youtube.com/watch?v=4TKjwIbjmpY">
+  <img src="https://img.youtube.com/vi/4TKjwIbjmpY/maxresdefault.jpg" alt="Ming-omni-tts" width="70%">
+</a>
 
 ## Updates
 
@@ -66,7 +58,7 @@ Ming-omni-tts is a high-performance unified audio generation model that achieves
 
 ## 🚀 Key Features
 Ming-omni-tts features key optimizations as follows, compared to other audio-assisted LLMs:
-- **Unified Continuous Audio Tokenizer**: We proposes a continuous VAE-based tokenizer that integrates speech, music, and general audio into a unified latent space with 12.5 Hz frame rate, yielding competitive results across audio reconstruction and various downstream synthesis benchmarks.
+- **Unified Continuous Audio Tokenizer**: We propose a continuous VAE-based tokenizer that integrates speech, music, and general audio into a unified latent space with 12.5 Hz frame rate, yielding competitive results across audio reconstruction and various downstream synthesis benchmarks.
 <p align="center">
     <img src="./figures/Ming-Audio-Tokenizer-12.5hz.png" width="600"/>
 <p>
@@ -1002,8 +994,7 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
 </table>
 
 
-### Advanced Processing
-#### Text Normalization
+### Text Normalization
 
 <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #000; border-bottom: 1px solid #000; font-family: Arial, sans-serif; margin: 16px 0;">
 <caption><strong> Text Normalization performance comparison on the internally constructed test set </strong></caption>
