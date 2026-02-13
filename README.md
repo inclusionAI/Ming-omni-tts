@@ -47,10 +47,8 @@ Ming-omni-tts is a high-performance unified audio generation model that achieves
 
 ## Demo
 
-<div align="center">
-  <video src="https://github.com/user-attachments/assets/8cfb158d-f6c7-4234-a95c-3ba1d192ba99
-  " width="70%" poster=""> </video>
-</div>
+https://github.com/user-attachments/assets/eb0e900e-ed5e-40ca-98df-31c244939527
+
 
 ## Updates
 
