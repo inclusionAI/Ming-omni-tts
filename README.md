@@ -39,16 +39,18 @@ Ming-omni-tts is a high-performance unified audio generation model that achieves
 
 <strong>🚀 Core Capabilities</strong>
 
-- 🔊 **Fine-grained Vocal Control:** Enables precise control over speech rate, pitch, volume, emotion, and dialects via simple instructions. It achieves **93%** accuracy for Cantonese (outperforming CosyVoice3) and **46.7%** for emotional control (surpassing Qwen3-TTS).
+- 🔊 **Fine-grained Vocal Control:** The model supports precise control over speech rate, pitch, volume, emotion, and dialect through simple commands. Notably, its accuracy for Cantonese dialect control is as high as **93%**, and its emotion control accuracy reaches **46.7%**, surpassing CosyVoice3.
 - 🌌  **Intelligent Voice Design:** Features 100+ premium built-in voices and supports zero-shot voice design through natural language descriptions. Its performance on the Instruct-TTS-Eval-zh benchmark is on par with Qwen3-TTS.
 - 🎶  **Immersive Unified Generation:** The industry’s first autoregressive model to jointly generate speech, ambient sound, and music in a single channel. Built on a custom 12.5Hz continuous tokenizer and a DiT head architecture, it delivers a seamless, "in-the-scene" auditory experience.
 - ⚡ **High-efficiency Inference:** Introduces a "Patch-by-Patch" compression strategy that reduces the LLM inference frame rate to 3.1Hz. This significantly cuts latency and enables podcast-style audio generation while preserving naturalness and audio detail.
 - 🧪 **Professional Text Normalization:** The model accurately parses and narrates complex formats, including mathematical expressions and chemical equations, ensuring natural-sounding output for specialized applications.
 
 ## Demo
-<a href="https://www.youtube.com/watch?v=4TKjwIbjmpY">
-  <img src="https://img.youtube.com/vi/4TKjwIbjmpY/maxresdefault.jpg" alt="Ming-omni-tts" width="70%">
-</a>
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/8cfb158d-f6c7-4234-a95c-3ba1d192ba99
+  " width="70%" poster=""> </video>
+</div>
 
 ## Updates
 
