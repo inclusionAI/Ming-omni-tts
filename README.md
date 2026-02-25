@@ -1115,14 +1115,7 @@ docker run -it --gpus all Ming-omni-tts:v1.1 /bin/bash
 
 
 ## Example Usage
-### Audio Reconstruction
-```bash
-git clone https://github.com/inclusionAI/MingTok-Audio.git
-cd MingTok-Audio
-python3 test.py
-```
 
-### Audio Generation
 ```bash
 git clone https://github.com/inclusionAI/Ming-omni-tts.git
 cd Ming-omni-tts
