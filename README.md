@@ -1063,13 +1063,6 @@ You can download our latest model and Benchmark from both Huggingface and ModelS
           <a href="https://modelscope.cn/models/inclusionAI/Ming-omni-tts-16.8B-A3B">🤖 ModelScope</a>
         </td>
       </tr>
-      <tr>
-        <td style="padding: 8px; text-align: center;">Ming-omni-tta-0.5B</td>
-        <td style="padding: 8px; text-align: center;">
-          <a href="https://huggingface.co/inclusionAI/Ming-omni-tta-0.5B">🤗 HuggingFace</a><br>
-          <a href="https://modelscope.cn/models/inclusionAI/Ming-omni-tta-0.5B">🤖 ModelScope</a>
-        </td>
-      </tr>
     </tbody>
   </table>
   <table style="width: 100%; max-width: 600px; margin: 16px 0;">
