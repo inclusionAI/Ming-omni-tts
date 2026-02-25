@@ -7,7 +7,7 @@
 ">
 <img src="./figures/ant-bailing.png" width="60" alt="Ming-omni-tts Logo" />
   <h1 style="margin: 0;">
-        Ming-omni-tts: A Simple and Efficient Unified Generation of Speech, Music, and Sound with Precise Control
+        Ming-omni-tts: Simple and Efficient Unified Generation of Speech, Music, and Sound with Precise Control
   </h1>
   
 </div>
