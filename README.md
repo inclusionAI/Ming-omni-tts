@@ -969,13 +969,6 @@ Below is a comparison between Ming-omni-tts and other state-of-the-art (SOTA) mo
       <td style="text-align: center; padding: 8px; border: none;">0.523</td>
     </tr>
     <tr>
-      <td style="text-align: center; padding: 8px; border: none;"><strong><u>Ming-omni-tta-0.5B(ours)</u></strong></td>
-      <td style="text-align: center; padding: 8px; border: none;">Ant Group</td>
-      <td style="text-align: center; padding: 8px; border: none;"><strong><u>53.384</u></strong></td>
-      <td style="text-align: center; padding: 8px; border: none;">1.172</td>
-      <td style="text-align: center; padding: 8px; border: none;">0.504</td>
-    </tr>
-    <tr>
       <td style="text-align: center; padding: 8px; border: none;"><strong><u>Ming-omni-tts-0.5B(ours)</u></strong></td>
       <td style="text-align: center; padding: 8px; border: none;">Ant Group</td>
       <td style="text-align: center; padding: 8px; border: none;">74.292</td>
