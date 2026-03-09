@@ -85,20 +85,14 @@ def set_attn_backend(config_like, backend: str):
     config_like._attn_implementation = backend
 
 
-def resolve_qwen_attention_backend(device, prefer_flash: bool = True) -> str:
-    if not device.startswith("cuda"):
-        return "eager"
+def resolve_qwen_attention_backend(device) -> str:
     if not torch.cuda.is_bf16_supported(including_emulation=False):
         return "eager"
-    if prefer_flash:
-        try:
-            import flash_attn  # noqa: F401
-            return "flash_attention_2"
-        except Exception:
-            pass
-    if hasattr(torch.nn.functional, "scaled_dot_product_attention"):
+    try:
+        import flash_attn  # noqa: F401
+        return "flash_attention_2"
+    except ImportError:
         return "sdpa"
-    return "eager"
 
 
 def seed_everything(seed=1895):

@@ -439,10 +439,6 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         temperature=0,
         use_zero_spk_emb=False
     ):
-        if self._infer_dtype == torch.float16:
-            logger.info("[dtype] T4: upcasting model to float32 for this call")
-            self.float()
-
         stream_state = (None, None, None)
         past_key_values = None
         use_cache = True
