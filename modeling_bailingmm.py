@@ -58,9 +58,8 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         return next(self.model.parameters()).dtype
 
     def _autocast_context(self):
-        enabled = self.device.type == 'cuda' and self._infer_dtype in (torch.float16, torch.bfloat16)
-        dtype = self._infer_dtype if enabled else torch.bfloat16
-        return torch.autocast(device_type=self.device.type, dtype=dtype, enabled=enabled)
+        enabled = self.device.type == 'cuda' and self._infer_dtype == torch.bfloat16
+        return torch.autocast(device_type=self.device.type, dtype=torch.bfloat16, enabled=enabled)
 
     def get_rope_index(
         self,
