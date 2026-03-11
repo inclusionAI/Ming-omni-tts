@@ -18,6 +18,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 from modeling_bailingmm import BailingMMNativeForConditionalGeneration
+from configuration_bailingmm import BailingMMConfig
 from sentence_manager.sentence_manager import SentenceNormalizer
 from spkemb_extractor import SpkembExtractor
 
@@ -62,26 +63,80 @@ BASE_CAPTION_TEMPLATE = {
 }
 
 
+def resolve_llm_dtype(device):
+    if device.startswith("cuda"):
+        return (
+            torch.bfloat16
+            if torch.cuda.is_bf16_supported(including_emulation=False)
+            else torch.float32
+        )
+    return torch.float32
+
+
+def set_attn_backend(config_like, backend: str):
+    if config_like is None:
+        return
+    if isinstance(config_like, dict):
+        config_like["attn_implementation"] = backend
+        config_like["_attn_implementation"] = backend
+        return
+    config_like.attn_implementation = backend
+    config_like._attn_implementation = backend
+
+
+def resolve_qwen_attention_backend(device) -> str:
+    if not torch.cuda.is_bf16_supported(including_emulation=False):
+        return "eager"
+    try:
+        import flash_attn  # noqa: F401
+        return "flash_attention_2"
+    except ImportError:
+        return "sdpa"
+
+
 class MingAudio:
     def __init__(self, model_path, device="cuda:0"):
         self.device = device
-        self.model = BailingMMNativeForConditionalGeneration.from_pretrained(
-            model_path,
-            torch_dtype=torch.bfloat16,
-            low_cpu_mem_usage=True,
-        )
-        self.model = self.model.eval().to(torch.bfloat16).to(self.device)
+        local_model_path = model_path if os.path.isdir(model_path) else snapshot_download(repo_id=model_path)
+        config = BailingMMConfig.from_pretrained(local_model_path)
+        if config.model_type == 'dense':
+            self.llm_dtype = resolve_llm_dtype(device)
+            set_attn_backend(config, "eager")
+            qwen_attn_impl = resolve_qwen_attention_backend(device)
+            set_attn_backend(config.llm_config, qwen_attn_impl)
+
+            if hasattr(config, "audio_tokenizer_config"):
+                if hasattr(config.audio_tokenizer_config, "enc_kwargs"):
+                    if "backbone" in config.audio_tokenizer_config.enc_kwargs:
+                        set_attn_backend(config.audio_tokenizer_config.enc_kwargs["backbone"], qwen_attn_impl)
+                if hasattr(config.audio_tokenizer_config, "dec_kwargs"):
+                    if "backbone" in config.audio_tokenizer_config.dec_kwargs:
+                        set_attn_backend(config.audio_tokenizer_config.dec_kwargs["backbone"], qwen_attn_impl)
+
+            self.model = BailingMMNativeForConditionalGeneration.from_pretrained(
+                local_model_path,
+                config=config,
+                torch_dtype=self.llm_dtype,
+                low_cpu_mem_usage=True,
+            )
+            self.model = self.model.eval().to(self.llm_dtype).to(self.device)
+        else:
+            self.llm_dtype = torch.bfloat16
+            self.model = BailingMMNativeForConditionalGeneration.from_pretrained(
+                local_model_path,
+                torch_dtype=self.llm_dtype,
+                low_cpu_mem_usage=True,
+            )
+            self.model = self.model.eval().to(self.llm_dtype).to(self.device)
 
         if self.model.model_type == 'dense':
-            self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+            self.tokenizer = AutoTokenizer.from_pretrained(local_model_path)
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(".", trust_remote_code=True)
         self.model.tokenizer = self.tokenizer
         self.sample_rate = self.model.config.audio_tokenizer_config.sample_rate
         self.patch_size = self.model.config.ditar_config['patch_size']
         self.normalizer = self.init_tn_normalizer(tokenizer=self.tokenizer)
-
-        local_model_path = model_path if os.path.isdir(model_path) else snapshot_download(repo_id=model_path)
         self.spkemb_extractor = SpkembExtractor(f"{local_model_path}/campplus.onnx")
 
 
@@ -164,7 +219,7 @@ class MingAudio:
         if prompt_wav_path is None:
             prompt_waveform, prompt_text, spk_emb = None, None, None
             if use_zero_spk_emb:
-                spk_emb = [torch.zeros(1, 192, device=self.device, dtype=torch.bfloat16)]
+                spk_emb = [torch.zeros(1, 192, device=self.device, dtype=self.llm_dtype)]
         else:
             paths = prompt_wav_path if isinstance(prompt_wav_path, list) else [prompt_wav_path]
             processed_prompts = [self.preprocess_one_prompt_wav(p, use_spk_emb) for p in paths]
@@ -213,6 +268,8 @@ class MingAudio:
 
 
 if __name__ == "__main__":
+    # Dense 0.5B automatically falls back to float32 on non-bf16 CUDA GPUs such as T4.
+    # MoE loading and inference remain unchanged.
     model = MingAudio("inclusionAI/Ming-omni-tts-0.5B")
     # model = MingAudio("inclusionAI/Ming-omni-tta-0.5B")  # Only for TTA task
     # model = MingAudio("inclusionAI/Ming-omni-tts-16.8B-A3B")

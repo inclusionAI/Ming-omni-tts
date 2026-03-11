@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
 # Copyright (c) Ant Group. All rights reserved.
-
 import torch
 import torch.nn as nn
 from tqdm import tqdm
@@ -12,7 +11,6 @@ from fm.dit import Aggregator
 from fm.flowloss import FlowLoss
 from modeling_bailing_moe import BailingMoeForCausalLM
 from audio_tokenizer.modeling_audio_vae import AudioVAE
-
 
 _CONFIG_FOR_DOC = "BailingMMConfig"
 
@@ -26,33 +24,29 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
     _tied_weights_keys = ["model.lm_head.weight"]
 
     def __init__(
-        self,
-        config: BailingMMConfig,
-    ):
+        self, 
+        config: BailingMMConfig
+        ):
         super().__init__(config)
         self.config: BailingMMConfig = config
 
-        self.llm_dytpe = torch.bfloat16
         self.model_type = config.model_type
 
         # Dense Model: Utilizes the Qwen2.5-0.5B model.
         # MoE Model: Utilizes the Bailing-MoE-Lite-16.8B model.
         if self.model_type == 'dense':
-            config = Qwen2Config.from_dict(self.config.llm_config)
-            self.model = Qwen2ForCausalLM(config)
+            llm_config = Qwen2Config.from_dict(self.config.llm_config)
+            self.model = Qwen2ForCausalLM(llm_config)
         else:
             self.model = BailingMoeForCausalLM(self.config.llm_config)
 
-        # Audio tokenizer
         self.audio = AudioVAE(self.config.audio_tokenizer_config)
-
         self.latent_dim = self.config.audio_tokenizer_config.enc_kwargs['latent_dim']
         self.linear_proj_audio = Aggregator(
             in_channels=self.latent_dim,
             llm_input_dim=self.model.config.hidden_size,
             **self.config.aggregator_config,
         )
-
         self.patch_size = self.config.ditar_config['patch_size']
         self.history_patch_size = self.config.ditar_config.get('history_patch_size', self.patch_size)
         self.flowloss = FlowLoss(
@@ -63,6 +57,14 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         self.stop_head = nn.Linear(self.model.config.hidden_size, 2, bias=True)
         self.spk_head = nn.Linear(192, self.model.config.hidden_size, bias=True)
         self.post_init()
+
+    @property
+    def _infer_dtype(self) -> torch.dtype:
+        return next(self.model.parameters()).dtype
+
+    def _autocast_context(self):
+        enabled = self.device.type == 'cuda' and self._infer_dtype == torch.bfloat16
+        return torch.autocast(device_type=self.device.type, dtype=torch.bfloat16, enabled=enabled)
 
     def get_rope_index(
         self,
@@ -255,6 +257,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
                         self.tokenizer.encode("<audioPatch>") +
                         self.tokenizer.encode("</spk>\n")
                     )
+
         # Process Instruction Control (if provided)
         instruction_prompt = []
         if instruction is not None:
@@ -313,7 +316,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
 
         input_ids = torch.tensor(input_part, dtype=torch.long).unsqueeze(0).to(self.device)
         inputs_embeds = self.model.get_input_embeddings()(input_ids).to(self.device)
-        
+
         # Inject speaker embeddings.
         if spk_emb is not None:
             if self.model_type == 'dense':
@@ -324,7 +327,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
             assert len(spk_indices) > 0
             for i, se in enumerate(spk_emb):
                 inputs_embeds[0, spk_indices[i] + 1] = se
-        
+
         # NOTE: This implementation currently assumes a batch size of 1.
         if prompt_latent is not None:
             audio_token_id = self.tokenizer.convert_tokens_to_ids("<audio>")
@@ -409,7 +412,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
                 video_token_id=self.config.llm_config.image_patch_token,
                 image_start_token_id=self.config.llm_config.image_start_token,
                 video_start_token_id=self.config.llm_config.video_start_token,
-                image_grid_thw=None,
+                image_grid_thw=None, 
                 video_grid_thw=None,
                 attention_mask=attention_mask,
             )
@@ -419,7 +422,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         result = []
         # Each inference step combines Autoregressive (AR) decoding with Flow Matching
         for step in tqdm(range(max_decode_steps)):
-            with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
+            with self._autocast_context():
                 outputs = self.model(
                     attention_mask=attention_mask,
                     position_ids=position_ids,
@@ -436,14 +439,17 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
 
             # Initialize the latent_history for the first step
             if step == 0:
-                latent_history = torch.zeros(1, self.history_patch_size, self.latent_dim).to(z_diff.device)
+                latent_history = torch.zeros(
+                    1, self.history_patch_size, self.latent_dim,
+                    dtype=z_diff.dtype, device=z_diff.device
+                )
                 if prompt_latent is not None:
                     start_index = self.history_patch_size - prompt_latent.size(1)
                     if start_index < 0:
-                        latent_history[:] = prompt_latent[:, -start_index:,:]
+                        latent_history[:] = prompt_latent[:, -start_index:, :]
                     else:
-                        latent_history[:, start_index:,:] = prompt_latent
-                    
+                        latent_history[:, start_index:, :] = prompt_latent
+
             # Predict the latent for the current timestep using the Flow Matching head, conditioned on the history and other inputs.
             sampled_token_latent, trajectory = self.flowloss.sample(z_diff, latent_history, cfg, self.patch_size, sigma=sigma, temperature=temperature)
             result.append(sampled_token_latent)
@@ -497,7 +503,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         use_cache = True
         speech = []
         sampled_tokens_list = []
-        with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
+        with self._autocast_context():
             for sampled_tokens, last_chunk in self.sample(
                     prompt=prompt,
                     text=text,
@@ -524,7 +530,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         #     speech = self.audio.decode(sampled_tokens, past_key_values=None, use_cache=False)[0]
 
         return speech.cpu().float()[0]
-    
+
     @torch.inference_mode()
     def generate_text(
         self,
@@ -533,7 +539,7 @@ class BailingMMNativeForConditionalGeneration(PreTrainedModel):
         max_decode_steps=200,
     ):
         sampled_texts_list = []
-        with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
+        with self._autocast_context():
             for sampled_tokens, last_chunk in self.sample_text(
                     prompt=prompt,
                     text=text,
