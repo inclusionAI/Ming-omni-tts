@@ -7,11 +7,9 @@ from transformers.cache_utils import DynamicCache
 
 try:
     from flash_attn import flash_attn_func
+    HAS_FLASH_ATTN = True
 except (ImportError, RuntimeError, OSError):
-    raise ImportError(
-        "Flash Attention is a required dependency but could not be imported.\n"
-        "Please check your installation and environment compatibility (e.g., CUDA version).\n"
-    )
+    HAS_FLASH_ATTN = False
 
 
 class LayerNorm(nn.LayerNorm):
@@ -78,8 +76,13 @@ class MultiHeadAttention(nn.Module):
         if past_key_values is not None:
             k, v = past_key_values.update(k, v, self.layer_idx, {"cache_position": cache_position})
 
-        a = flash_attn_func(q.permute(0, 2, 1, 3), k.permute(0, 2, 1, 3), v.permute(0, 2, 1, 3), causal=True)
-        out = a.flatten(start_dim=2)
+        if HAS_FLASH_ATTN:
+            a = flash_attn_func(q.permute(0, 2, 1, 3), k.permute(0, 2, 1, 3), v.permute(0, 2, 1, 3), causal=True)
+            out = a.flatten(start_dim=2)
+        else:
+            # Native PyTorch SDPA (T4 friendly)
+            a = torch.nn.functional.scaled_dot_product_attention(q, k, v, is_causal=True)
+            out = a.transpose(1, 2).contiguous().flatten(start_dim=2)
         qk = None
 
         return out, qk, past_key_values
