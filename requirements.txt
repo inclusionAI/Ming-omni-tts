@@ -4,7 +4,7 @@ torchvision==0.21.0
 tokenizers==0.21.4
 grouped_gemm==0.1.4
 peft==0.17.1
-diffusers==0.33.0
+diffusers==0.38.0
 decord==0.6.0
 hyperpyyaml==1.2.2
 soundfile==0.12.1
